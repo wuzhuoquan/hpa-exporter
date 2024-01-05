@@ -1,46 +1,47 @@
 package main
 
 import (
-
 	"flag"
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"k8s.io/client-go/rest"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
-	"k8s.io/client-go/tools/clientcmd"
-	"hpa-exportor/pkg/metrics"
 	"hpa-exportor/pkg/kube"
+	"hpa-exportor/pkg/metrics"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func main() {
 
 	kubeconfig := flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	metricPrefix := flag.String("prefix", "kube_", "metrics prefix, default kube_")
 
 	flag.Parse()
 
 	var config *rest.Config
-	//var err error
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		fmt.Println("error")
-	}
-	//if strings.Compare(*kubeconfig, "") == 0 {
-	//	config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	//	if err != nil {
-	//		fmt.Printf("Error building kubeconfig: %v\n", err)
-	//		os.Exit(1)
-	//	}
-	//} else {
-	//	if config, err = rest.InClusterConfig(); err != nil {
-	//		if config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig); err != nil {
-	//			panic(any(err))
-	//		}
-	//	}
+	var err error
+	//config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	//if err != nil {
+	//	fmt.Println("error")
 	//}
-	metricsStore := metrics.NewMetricsStore("kube_")
+	if strings.Compare(*kubeconfig, "") != 0 {
+		config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
+		if err != nil {
+			fmt.Printf("Error building kubeconfig: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
+		if config, err = rest.InClusterConfig(); err != nil {
+			fmt.Printf("Error building kubeclient: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	metricsStore := metrics.NewMetricsStore(*metricPrefix)
 	metrics.Init(":8080", "")
 	hpawatcher := kube.NewHpaWatcher(config, metricsStore)
 

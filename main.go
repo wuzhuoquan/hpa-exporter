@@ -10,8 +10,8 @@ import (
 	"strings"
 	"syscall"
 
-	"hpa-exportor/pkg/kube"
-	"hpa-exportor/pkg/metrics"
+	"hpa-exporter/pkg/kube"
+	"hpa-exporter/pkg/metrics"
 	"k8s.io/client-go/tools/clientcmd"
 )
 

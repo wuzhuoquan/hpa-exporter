@@ -1,4 +1,4 @@
-module hpa-exportor
+module hpa-exporter
 
 go 1.21.5
 

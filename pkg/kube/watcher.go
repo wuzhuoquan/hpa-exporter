@@ -3,7 +3,7 @@ package kube
 import (
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
-	"hpa-exportor/pkg/metrics"
+	"hpa-exporter/pkg/metrics"
 	hpav1 "k8s.io/api/autoscaling/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/klog/v2"
